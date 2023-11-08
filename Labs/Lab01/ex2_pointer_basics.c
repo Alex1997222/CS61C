@@ -7,10 +7,15 @@ int main() {
   // TODO: create a pointer to x
   // Hint: the first blank should be a variable type
   //       the second blank should be the address of x
-  ______ pointer_to_x = ________;
+  int* pointer_to_x = &x;
 
   // This line should print 5
   printf("%d\n", *pointer_to_x);
+  printf("%x\n", pointer_to_x);
+
+  pointer_to_x += 2;
+  printf("%d\n", *pointer_to_x);
+  printf("%x\n", pointer_to_x);
 
   return 0;
 }
