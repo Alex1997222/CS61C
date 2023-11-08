@@ -9,6 +9,8 @@ int main(int argc, char *argv[]) {
         (*p)++; // Do you understand this line of code and all the other permutations of the operators? ;)
     }
 
+    //123
+
     printf("Thanks for waddling through this program. Have a nice day.");
     return 0;
 }
