@@ -3,7 +3,9 @@
 #include <string.h>
 
 char *copy_str(char *s) {
-    char *new_str = malloc(strlen(s) * sizeof(char));
+    if(s == NULL) return NULL;
+    int len = strlen(s);
+    char *new_str = malloc((len+1) * sizeof(char));
     strcpy(new_str, s);
     return new_str;
 }
@@ -11,6 +13,6 @@ char *copy_str(char *s) {
 int main() {
     char * copy_of_str = copy_str("hello world!");
     printf("%s\n", copy_of_str);
-
+    free(copy_of_str);
     return 0;
 }

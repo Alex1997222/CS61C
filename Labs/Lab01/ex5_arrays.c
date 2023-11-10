@@ -16,7 +16,7 @@ int main() {
 
   // TODO: compute the address of the element at index 2 (0-indexed)
   int8_t* ptr_to_idx_2 = &some_array[2];
-  printf("address of index 2: %p\n", ptr_to_idx_2);
+  printf("address of index 2: %p\n", ptr_to_idx_2); //add one byte
 
   // TODO: store the value 10 at index 2, using ptr_to_idx_2
   *ptr_to_idx_2 = 10;
@@ -25,6 +25,6 @@ int main() {
   // Hint: this blank should be the same as the previous blank
   //       please don't hard code 10
   printf("value at index 2: %d\n", *ptr_to_idx_2);
-
+  
   return 0;
 }

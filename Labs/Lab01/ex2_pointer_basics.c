@@ -14,6 +14,7 @@ int main() {
   printf("%x\n", pointer_to_x);
 
   pointer_to_x += 2;
+  
   printf("%d\n", *pointer_to_x);
   printf("%x\n", pointer_to_x);
 
