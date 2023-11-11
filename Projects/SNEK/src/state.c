@@ -23,13 +23,55 @@ static void update_head(game_state_t* state, unsigned int snum);
 
 /* Task 1 */
 game_state_t* create_default_state() {
-  // TODO: Implement this function.
-  return NULL;
+  // allocate memory on heap
+  game_state_t* defaultState = (game_state_t*)malloc(sizeof(game_state_t));  
+
+  defaultState->num_rows = 18;
+  defaultState->num_snakes = 1;
+
+  //allocate the board
+  unsigned int defaultCols = 20;
+  defaultState->board = (char**)malloc(defaultState->num_rows*sizeof(char*));
+  for(int i = 0; i < defaultState->num_rows; ++i){
+      defaultState->board[i] = (char*)malloc((defaultCols+1)*sizeof(char));
+  }
+
+  //create board
+  char* lineBorader = "####################";
+  char* lineArea = "#                  #";
+  strcpy(defaultState->board[0],lineBorader);
+  for(int i = 1; i < defaultState->num_rows-1; ++i){
+      strcpy(defaultState->board[i],lineArea);
+  }
+  strcpy(defaultState->board[defaultState->num_rows-1],lineBorader);
+
+  //create default snake
+  snake_t* snake = (snake_t*)malloc(sizeof(snake_t));
+  snake->live = true;
+  snake->head_row = 2;
+  snake->head_col = 4;
+  snake->tail_row = 2;
+  snake->tail_col = 2;
+  defaultState->snakes = snake;
+
+  //draw snake onboard
+  defaultState->board[snake->head_row][snake->head_col] = 'D';
+  defaultState->board[snake->tail_row][snake->tail_col] = 'd';
+  defaultState->board[snake->head_row][snake->head_col-snake->tail_col+1] = '>';
+  defaultState->board[2][9] = '*';
+
+  //return the result
+  return defaultState;
 }
 
 /* Task 2 */
 void free_state(game_state_t* state) {
-  // TODO: Implement this function.
+  free(state->snakes);
+  for(int i = 0; i < state->num_rows;++i){
+      free(state->board[i]);
+  }
+  free(state->board);
+  free(state);
   return;
 }
 
