@@ -52,7 +52,7 @@ game_state_t* create_default_state() {
   snake.head_col = 4;
   snake.tail_row = 2;
   snake.tail_col = 2;
-  defaultState->snakes = (snake_t*)malloc(sizeof(snake_t));
+  defaultState->snakes = (snake_t*)malloc(defaultState->num_snakes*sizeof(snake_t));
   defaultState->snakes[0] = snake;
 
   //draw snake onboard
@@ -225,7 +225,7 @@ static char next_square(game_state_t* state, unsigned int snum) {
     unsigned int chrow = state->snakes[snum].head_row;
     unsigned int chcol = state->snakes[snum].head_col;
 
-    char head = state->board[chrow][chcol];
+    char head = get_board_at(state,chrow,chcol);
 
     // Calculate the next row and column based on the direction of the head
     unsigned int next_row = chrow;
@@ -260,11 +260,36 @@ static char next_square(game_state_t* state, unsigned int snum) {
 */
 static void update_head(game_state_t* state, unsigned int snum) {
     if (state == NULL) {
-        return;
+        return; // Error handling: return '?' if state is NULL
     }
+    unsigned int chrow = state->snakes[snum].head_row;
+    unsigned int chcol = state->snakes[snum].head_col;
 
+    char head = get_board_at(state,chrow,chcol);
+
+    // Calculate the next row and column based on the direction of the head
+    unsigned int next_row = chrow;
+    unsigned int next_col = chcol;
     
+    switch (head) {
+        case 'W': // Moving up
+        case 'S': // Moving down
+            next_row = get_next_row(chrow,head);
+            break;
+        case 'A': // Moving left
+        case 'D': // Moving right
+            next_col = get_next_col(chcol,head);
+            break;
+        default:
+            return;
+    }
+    // Update the board
+    set_board_at(state,next_row,next_col,head);
+    set_board_at(state,chrow,chcol,head_to_body(head));
 
+    // Update the snake
+    state->snakes[snum].head_row = next_row;
+    state->snakes[snum].head_col = next_col;
 }
 
 /*
@@ -278,14 +303,59 @@ static void update_head(game_state_t* state, unsigned int snum) {
   ...in the snake struct: update the row and col of the tail
 */
 static void update_tail(game_state_t* state, unsigned int snum) {
-  // TODO: Implement this function.
-  return;
+  if (state == NULL) {
+        return; // Error handling: return '?' if state is NULL
+    }
+    unsigned int chrow = state->snakes[snum].tail_row;
+    unsigned int chcol = state->snakes[snum].tail_col;
+
+    char tail = get_board_at(state,chrow,chcol);
+
+    // Calculate the next row and column based on the direction of the head
+    unsigned int next_row = chrow;
+    unsigned int next_col = chcol;
+    
+    switch (tail) {
+        case 'w': // Moving up
+        case 's': // Moving down
+            next_row = get_next_row(chrow,tail);
+            break;
+        case 'a': // Moving left
+        case 'd': // Moving right
+            next_col = get_next_col(chcol,tail);
+            break;
+        default:
+            return;
+    }
+    // Update the board
+    char nextBody = get_board_at(state,next_row,next_col);
+    set_board_at(state,next_row,next_col,body_to_tail(nextBody));
+    set_board_at(state,chrow,chcol,' ');
+
+    // Update the snake
+    state->snakes[snum].tail_row = next_row;
+    state->snakes[snum].tail_col = next_col;
 }
 
 /* Task 4.5 */
 void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
-  // TODO: Implement this function.
-  return;
+  for(unsigned int i = 0; i < state->num_snakes; ++i){
+      // get next square
+      char nq = next_square(state,i);
+      if(nq == '#' || is_snake(nq)){
+         unsigned int chrow = state->snakes[i].head_row;
+         unsigned int chcol = state->snakes[i].head_col; 
+         set_board_at(state,chrow,chcol,'x');
+         state->snakes[i].live = false;
+      }else if(nq == '*'){
+         update_head(state,i);
+         // generate new frut
+         add_food(state);
+      }else{
+         update_head(state,i);
+         update_tail(state,i);
+      }
+  }
 }
 
 /* Task 5 */
