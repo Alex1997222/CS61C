@@ -360,8 +360,57 @@ void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
 
 /* Task 5 */
 game_state_t* load_board(FILE* fp) {
-  // TODO: Implement this function.
-  return NULL;
+  if(fp == NULL){
+     return NULL;
+  }
+  
+  // create new state and initialize
+  game_state_t* state = (game_state_t*)malloc(sizeof(game_state_t));
+  if(state == NULL){
+     return NULL;
+  }
+  state->board = NULL;
+  state->snakes = NULL;
+  state->num_rows = 0;
+  state->num_snakes = 0;
+
+  // read board
+  char* buffer = NULL;
+  size_t bufferlen = 0;
+  int ch;
+  while((ch = fgetc(fp)) != EOF){
+      if(ch == '\n'){
+         // realloc memory
+         buffer = (char*)realloc(buffer,bufferlen+1);
+         if(buffer == NULL){
+            return NULL;
+         }
+         buffer[bufferlen] = '\0';
+
+         // allocate the memory
+         state->board = (char**)realloc(state->board,(state->num_rows+1)*sizeof(char*));
+         state->board[state->num_rows++] = buffer;
+
+         // initialize
+         buffer = NULL;
+         bufferlen = 0;
+      }else{
+         // realloc memory
+         buffer = (char*)realloc(buffer,bufferlen+1);
+         if(buffer == NULL){
+            return NULL;
+         }
+
+         // reassign memory
+         buffer[bufferlen++] = (char)ch;
+      }
+  }
+
+  if(buffer != NULL){
+     free(buffer);
+  }
+
+  return state;
 }
 
 /*
@@ -373,12 +422,51 @@ game_state_t* load_board(FILE* fp) {
   fill in the head row and col in the struct.
 */
 static void find_head(game_state_t* state, unsigned int snum) {
-  // TODO: Implement this function.
-  return;
+    if(state == NULL || state->snakes == NULL){
+        return;
+    }
+
+    unsigned int ctrow = state->snakes[snum].tail_row;
+    unsigned int ctcol = state->snakes[snum].tail_col;
+    char current;
+
+    while(true){
+        current = state->board[ctrow][ctcol];
+
+        if(is_head(current)){
+            state->snakes[snum].head_row = ctrow;
+            state->snakes[snum].head_col = ctcol;
+            break;
+        }
+
+        ctrow = get_next_row(ctrow,current);
+        ctcol = get_next_col(ctcol,current);
+    }
 }
 
 /* Task 6.2 */
 game_state_t* initialize_snakes(game_state_t* state) {
-  // TODO: Implement this function.
-  return NULL;
+  if (state == NULL) {
+      return NULL; 
+  }
+
+  state->num_snakes = 0;
+  for(unsigned int i = 0; i < state->num_rows; ++i){
+     for(unsigned int j = 0; j < strlen(state->board[i]); ++j){
+         if(is_tail(state->board[i][j])){
+            state->snakes = (snake_t*)realloc(state->snakes,(state->num_snakes+1)*sizeof(snake_t));
+            if(state->snakes == NULL){
+                return NULL;
+            }
+            state->snakes[state->num_snakes].tail_row = i;
+            state->snakes[state->num_snakes].tail_col = j;
+
+            find_head(state, state->num_snakes);
+
+            state->num_snakes++;
+         }
+     }
+  }
+  
+  return state;
 }
